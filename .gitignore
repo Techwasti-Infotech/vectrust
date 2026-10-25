@@ -1,0 +1,8 @@
+/target
+**/*.rs.bk
+Cargo.lock
+*.tmp
+*.log
+vectrust_data*
+.idea/
+.vscode/
