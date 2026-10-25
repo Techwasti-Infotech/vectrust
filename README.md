@@ -250,6 +250,9 @@ cargo run --release --example hnsw_vs_flat_benchmark
 
 # 5. Persistent storage with simulated crash recovery and WAL replay
 cargo run --example persistent_storage
+
+# 6. RAG pipeline with context retrieval and AI agent long-term memory
+cargo run --example rag_pipeline_agent_memory
 ```
 
 ---
@@ -258,6 +261,7 @@ cargo run --example persistent_storage
 
 - [**Live Documentation & Playground**](https://techwastiinfotech.github.io/vectrust/)
 - [**Documentation Home**](docs/index.md)
+- [**RAG Pipelines & Agent Memory Guide**](docs/rag_and_agent_memory.md)
 - [**Local Development Setup Guide**](docs/local_setup.md)
 - [**Contributing Guidelines**](CONTRIBUTING.md)
 - [**Architecture & Internals**](docs/architecture.md)

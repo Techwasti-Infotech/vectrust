@@ -16,6 +16,7 @@ Welcome to the official documentation for **Vectrust**, a high-performance, embe
 ## Documentation Sections
 
 - [**Getting Started**](getting_started.md): Installation, first database creation, ingestion, search, and deletion.
+- [**RAG Pipelines & AI Agent Memory**](rag_and_agent_memory.md): Guide to using Vectrust for LLM retrieval and agent long-term memory.
 - [**Local Development Setup**](local_setup.md): Complete guide for setting up Rust, building executables, and running tests.
 - [**Contributing Guidelines**](../CONTRIBUTING.md): Workflow, coding standards, issue reporting, and pull request checklist.
 - [**Architecture & Internals**](architecture.md): Deep-dive into SIMD distance metrics, HNSW graph mechanics, WAL format, and concurrency design.
