@@ -40,24 +40,24 @@ Whether you are building on-device semantic search, local LLM retrieval-augmente
 ## 🏗️ Architecture
 
 ```mermaid
-graph TD
-    UserApp[User Application / Agent / RAG Pipeline] --> Vectrust[Vectrust Embedded DB]
-    Vectrust --> Collection[Collection: Thread-Safe Arc<RwLock>]
+flowchart TD
+    UserApp["User Application / Agent / RAG Pipeline"] --> Vectrust["Vectrust Embedded DB"]
+    Vectrust --> Collection["Collection: Thread-Safe Arc / RwLock"]
     
-    subgraph Engine Core
-        Collection --> HNSW[HNSW Graph Index (ANN)]
-        Collection --> Flat[Flat Linear Index (Exact)]
-        Collection --> Filter[Metadata & JSON Filter Engine]
+    subgraph EngineCore ["Engine Core"]
+        Collection --> HNSW["HNSW Graph Index (ANN)"]
+        Collection --> Flat["Flat Linear Index (Exact)"]
+        Collection --> Filter["Metadata & JSON Filter Engine"]
     end
 
-    subgraph Distance & SIMD
-        HNSW --> Dist[Vectorized Distance: L2 / Cosine / Dot / L1]
+    subgraph DistanceSIMD ["Distance & SIMD"]
+        HNSW --> Dist["Vectorized Distance: L2 / Cosine / Dot / L1"]
         Flat --> Dist
     end
 
-    subgraph Storage & Durability
-        Collection --> WAL[Write-Ahead Log: Append-Only Journal]
-        Collection --> Snapshot[Atomic Snapshot Engine: CRC32 Verified]
+    subgraph StorageDurability ["Storage & Durability"]
+        Collection --> WAL["Write-Ahead Log: Append-Only Journal"]
+        Collection --> Snapshot["Atomic Snapshot Engine: CRC32 Verified"]
     end
 ```
 
