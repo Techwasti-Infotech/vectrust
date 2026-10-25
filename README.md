@@ -1,7 +1,11 @@
 # Vectrust
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/techwasti/vectrust/main/assets/banner.png" alt="Vectrust Banner" width="700" onerror="this.style.display='none'"/>
+  <img src="assets/banner.png" alt="Vectrust Banner" width="850"/>
+</p>
+
+<p align="center">
+  <img src="assets/logo.png" alt="Vectrust Logo" width="110"/>
 </p>
 
 <p align="center">
