@@ -5,9 +5,15 @@ edition = "2021"
 authors = ["Vectrust Contributors"]
 description = "A high-performance, embedded vector database engine written in Rust"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/techwasti/vectrust"
+repository = "https://github.com/techwastiinfotech/vectrust"
+homepage = "https://techwastiinfotech.github.io/vectrust"
+documentation = "https://techwastiinfotech.github.io/vectrust"
 keywords = ["vector-database", "hnsw", "ann", "embeddings", "embedded-database"]
 categories = ["database-implementations", "data-structures", "algorithms"]
+
+[[bin]]
+name = "vectrust"
+path = "src/bin/vectrust.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

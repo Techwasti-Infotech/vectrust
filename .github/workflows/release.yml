@@ -1,0 +1,213 @@
+name: Release Executables & Tagging
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force create release even if version unchanged'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  check-version:
+    name: Check Cargo Version & Tag
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.check.outputs.version }}
+      tag: ${{ steps.check.outputs.tag }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version & Release Status
+        id: check
+        shell: bash
+        run: |
+          # Extract version from Cargo.toml
+          VERSION=$(grep -m1 '^version' Cargo.toml | awk -F '"' '{print $2}')
+          TAG="v$VERSION"
+          echo "Cargo.toml version: $VERSION"
+          echo "Target git tag: $TAG"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+          # Check if tag already exists in remote
+          TAG_EXISTS=$(git tag -l "$TAG")
+          FORCE="${{ inputs.force_release }}"
+
+          if [ -n "$TAG_EXISTS" ] && [ "$FORCE" != "true" ] && [[ "${{ github.ref }}" != refs/tags/* ]]; then
+            echo "Tag $TAG already exists on git and no version bump detected. Skipping release."
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "New version detected ($TAG)! Proceeding to build release executables."
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+  build-binaries:
+    name: Build (${{ matrix.target }})
+    needs: check-version
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            binary_name: vectrust
+            archive_ext: tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            binary_name: vectrust.exe
+            archive_ext: zip
+          - os: macos-13
+            target: x86_64-apple-darwin
+            binary_name: vectrust
+            archive_ext: tar.gz
+          - os: macos-14
+            target: aarch64-apple-darwin
+            binary_name: vectrust
+            archive_ext: tar.gz
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Build Executable
+        run: cargo build --release --bin vectrust --target ${{ matrix.target }}
+
+      - name: Package Binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          TAG="${{ needs.check-version.outputs.tag }}"
+          ARCHIVE_NAME="vectrust-${TAG}-${{ matrix.target }}.${{ matrix.archive_ext }}"
+          STAGE="staging"
+          mkdir -p "$STAGE"
+          cp "target/${{ matrix.target }}/release/${{ matrix.binary_name }}" "$STAGE/"
+          cp README.md LICENSE-MIT LICENSE-APACHE "$STAGE/"
+          
+          tar -czvf "$ARCHIVE_NAME" -C "$STAGE" .
+          shasum -a 256 "$ARCHIVE_NAME" > "${ARCHIVE_NAME}.sha256"
+          
+          mkdir -p dist
+          mv "$ARCHIVE_NAME" dist/
+          mv "${ARCHIVE_NAME}.sha256" dist/
+
+      - name: Package Binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $TAG = "${{ needs.check-version.outputs.tag }}"
+          $ARCHIVE_NAME = "vectrust-$TAG-${{ matrix.target }}.${{ matrix.archive_ext }}"
+          $STAGE = "staging"
+          New-Item -ItemType Directory -Path $STAGE
+          Copy-Item "target/${{ matrix.target }}/release/${{ matrix.binary_name }}" -Destination $STAGE/
+          Copy-Item "README.md", "LICENSE-MIT", "LICENSE-APACHE" -Destination $STAGE/
+          
+          Compress-Archive -Path "$STAGE/*" -DestinationPath $ARCHIVE_NAME
+          $hash = (Get-FileHash -Path $ARCHIVE_NAME -Algorithm SHA256).Hash.ToLower()
+          "$hash  $ARCHIVE_NAME" | Out-File -Encoding ascii "${ARCHIVE_NAME}.sha256"
+          
+          New-Item -ItemType Directory -Path dist
+          Move-Item $ARCHIVE_NAME dist/
+          Move-Item "${ARCHIVE_NAME}.sha256" dist/
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [check-version, build-binaries]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download All Binary Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-artifacts
+
+      - name: Stage Release Assets
+        id: stage
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          find downloaded-artifacts -type f -exec cp {} release-assets/ \;
+          echo "=== Release Assets Prepared ==="
+          ls -lah release-assets/
+
+      - name: Create Git Tag if missing
+        shell: bash
+        run: |
+          TAG="${{ needs.check-version.outputs.tag }}"
+          git config user.name "techwastiinfotech"
+          git config user.email "techwastiinfotech@users.noreply.github.com"
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Creating and pushing git tag $TAG"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          else
+            echo "Git tag $TAG already exists."
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check-version.outputs.tag }}
+          name: "Vectrust ${{ needs.check-version.outputs.tag }}"
+          draft: false
+          prerelease: false
+          files: release-assets/*
+          body: |
+            ## 🚀 Vectrust Embedded Vector Database Engine `${{ needs.check-version.outputs.tag }}`
+
+            ### 📦 Pre-Built Cross-Platform Executables
+            Download the pre-compiled binary for your operating system below:
+
+            | Platform / Architecture | Target Triple | Archive |
+            | :--- | :--- | :--- |
+            | 🐧 **Linux (x86_64)** | `x86_64-unknown-linux-gnu` | `vectrust-${{ needs.check-version.outputs.tag }}-x86_64-unknown-linux-gnu.tar.gz` |
+            | 🪟 **Windows (x86_64)** | `x86_64-pc-windows-msvc` | `vectrust-${{ needs.check-version.outputs.tag }}-x86_64-pc-windows-msvc.zip` |
+            | 🍎 **macOS (Apple Silicon M1/M2/M3)** | `aarch64-apple-darwin` | `vectrust-${{ needs.check-version.outputs.tag }}-aarch64-apple-darwin.tar.gz` |
+            | 🍏 **macOS (Intel x86_64)** | `x86_64-apple-darwin` | `vectrust-${{ needs.check-version.outputs.tag }}-x86_64-apple-darwin.tar.gz` |
+
+            All archives include `.sha256` checksum verification files.
+
+            ### ⚡ What's New & Included
+            - **CLI Binary Tool**: `info`, `check` (CRC32 validation), `benchmark`, and interactive `repl`.
+            - **HNSW Approximate Nearest Neighbor**: $O(\log N)$ proximity graph search.
+            - **Flat Ground Truth**: Multi-threaded linear scan baseline.
+            - **SIMD Distance Vectors**: Cosine, Euclidean (L2), Dot Product (MIPS), Manhattan (L1).
+            - **Storage Engine**: Append-only Write-Ahead Log (WAL) and atomic CRC32 snapshot compaction.
+            - **Deep Metadata Filtering**: Pre-filtering and filter-aware graph traversal.
+
+            ### 📚 Documentation
+            - Web Documentation: https://techwastiinfotech.github.io/vectrust/
+            - Crates.io: `vectrust = "${{ needs.check-version.outputs.version }}"`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

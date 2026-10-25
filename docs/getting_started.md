@@ -10,7 +10,7 @@ Add `vectrust` and `serde_json` to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-vectrust = { path = "path/to/vectrust" } # or version = "0.1.0" once published
+vectrust = "0.1.0"
 serde_json = "1.0"
 ```
 

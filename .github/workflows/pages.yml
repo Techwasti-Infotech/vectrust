@@ -1,0 +1,67 @@
+name: Deploy Documentation to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Rustdoc API Documentation
+        run: cargo doc --no-deps --all-features
+
+      - name: Assemble Documentation Site
+        shell: bash
+        run: |
+          mkdir -p _site
+          # Copy custom interactive documentation web application
+          cp -r site/* _site/
+          
+          # Copy raw markdown docs for direct linking
+          mkdir -p _site/docs
+          cp -r docs/* _site/docs/
+
+          # Copy generated Rustdoc API HTML
+          mkdir -p _site/rustdoc
+          cp -r target/doc/* _site/rustdoc/
+
+          # Prevent GitHub Pages from using Jekyll
+          touch _site/.nojekyll
+
+          echo "=== Assembled GitHub Pages Tree ==="
+          ls -lah _site/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

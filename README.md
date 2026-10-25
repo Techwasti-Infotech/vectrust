@@ -9,10 +9,17 @@
 </p>
 
 <p align="center">
-  <a href="https://crates.io/crates/vectrust"><img src="https://img.shields.io/badge/crates.io-v0.1.0-orange.svg" alt="Crates.io"/></a>
-  <a href="https://docs.rs/vectrust"><img src="https://img.shields.io/badge/docs.rs-vectrust-blue.svg" alt="Docs.rs"/></a>
-  <a href="https://github.com/techwasti/vectrust/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build Status"/></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg" alt="License"/></a>
+  <a href="https://github.com/techwastiinfotech/vectrust/releases"><img src="https://img.shields.io/github/v/release/techwastiinfotech/vectrust?style=for-the-badge&logo=github&color=6366f1" alt="Latest Release"/></a>
+  <a href="https://github.com/techwastiinfotech/vectrust/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/techwastiinfotech/vectrust/release.yml?branch=main&label=Release%20Build&style=for-the-badge&logo=githubactions&logoColor=white" alt="Release Build"/></a>
+  <a href="https://github.com/techwastiinfotech/vectrust/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/techwastiinfotech/vectrust/ci.yml?branch=main&label=CI%20Tests&style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status"/></a>
+  <a href="https://techwastiinfotech.github.io/vectrust/"><img src="https://img.shields.io/github/actions/workflow/status/techwastiinfotech/vectrust/pages.yml?branch=main&label=Docs%20Site&style=for-the-badge&logo=githubpages&logoColor=white" alt="GitHub Pages"/></a>
+  <a href="LICENSE-MIT"><img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue?style=for-the-badge" alt="License"/></a>
+</p>
+
+<p align="center">
+  <a href="https://techwastiinfotech.github.io/vectrust/">🌐 <strong>Live Documentation & Interactive Playground</strong></a> •
+  <a href="https://github.com/techwastiinfotech/vectrust/releases">📦 <strong>Download Executables</strong></a> •
+  <a href="https://techwastiinfotech.github.io/vectrust/rustdoc/vectrust/index.html">🦀 <strong>Rustdoc API</strong></a>
 </p>
 
 ---
@@ -145,6 +152,37 @@ Benchmark executed on 5,000 vectors ($D = 64$ dimensions, Cosine Metric, Release
 cargo run --release --example hnsw_vs_flat_benchmark
 cargo run --release --example concurrent_search
 ```
+
+---
+
+## 💻 CLI Executable Tool
+
+Vectrust includes a standalone, cross-platform command-line executable for managing databases, validating storage integrity, benchmarking, and interactive vector queries.
+
+```bash
+# 1. Inspect an existing database directory
+vectrust info ./data/my_vectrust_db
+
+# 2. Verify CRC32 data integrity of snapshots and WAL logs
+vectrust check ./data/my_vectrust_db
+
+# 3. Run embedded HNSW vs Flat performance benchmark
+vectrust benchmark --dim 128 --points 5000 --queries 100 --k 10
+
+# 4. Launch interactive terminal REPL (persistent or in-memory)
+vectrust repl ./data/my_vectrust_db
+```
+
+### 📦 Pre-Compiled Binary Releases
+
+Pre-compiled executables are automatically generated and attached on each version release:
+
+| Platform | Architecture | Target Triple | Package |
+| :--- | :--- | :--- | :--- |
+| 🐧 **Linux** | x86_64 | `x86_64-unknown-linux-gnu` | [Download `.tar.gz`](https://github.com/techwastiinfotech/vectrust/releases) |
+| 🪟 **Windows** | x86_64 | `x86_64-pc-windows-msvc` | [Download `.zip`](https://github.com/techwastiinfotech/vectrust/releases) |
+| 🍎 **macOS** | Apple Silicon (M1/M2/M3/M4) | `aarch64-apple-darwin` | [Download `.tar.gz`](https://github.com/techwastiinfotech/vectrust/releases) |
+| 🍏 **macOS** | Intel x86_64 | `x86_64-apple-darwin` | [Download `.tar.gz`](https://github.com/techwastiinfotech/vectrust/releases) |
 
 ---
 
