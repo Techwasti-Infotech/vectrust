@@ -13,7 +13,7 @@ const SNAPSHOT_MAGIC: &[u8; 4] = b"VECS";
 const SNAPSHOT_VERSION: u16 = 1;
 
 /// Payload holding the entire serializable state of a collection.
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SnapshotData {
     pub config: CollectionConfig,
     pub flat_index: Option<FlatIndex>,

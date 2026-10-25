@@ -137,10 +137,15 @@ impl Filter {
             }
             Filter::Contains(field, substr) => {
                 let Some(payload) = payload else { return false };
-                if let Some(Value::String(s)) = resolve_path(payload, field) {
-                    s.contains(substr)
-                } else {
-                    false
+                match resolve_path(payload, field) {
+                    Some(Value::String(s)) => s.contains(substr),
+                    Some(Value::Array(arr)) => {
+                        arr.iter().any(|item| match item {
+                            Value::String(s) => s == substr || s.contains(substr),
+                            _ => false,
+                        })
+                    }
+                    _ => false,
                 }
             }
         }
