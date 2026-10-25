@@ -1,0 +1,59 @@
+name: 💡 Feature Request
+description: Propose a new feature, optimization, or index enhancement for Vectrust
+title: "[Feature]: "
+labels: ["enhancement", "proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make Vectrust faster, more capable, or more ergonomic? We'd love to hear it!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: Is your feature request related to a problem or limitation? Please describe it clearly.
+      placeholder: I'm currently unable to perform scalar quantization (SQ8) to compress vector memory by 4x...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution & API Design
+      description: Describe your proposed solution and how the Rust API or CLI should look.
+      placeholder: |
+        Introduce `IndexType::HnswQuantized` or a quantization option on `CollectionConfigBuilder`...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions Considered
+      description: Any alternative designs or workarounds you have considered.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      options:
+        - HNSW Graph Index
+        - Flat Linear Index
+        - SIMD Distance Metrics
+        - Metadata Filtering
+        - Storage & Persistence (WAL / Snapshot)
+        - CLI Executable
+        - Documentation / Examples
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to submit a pull request implementing this feature!
+          required: false

@@ -16,6 +16,8 @@ Welcome to the official documentation for **Vectrust**, a high-performance, embe
 ## Documentation Sections
 
 - [**Getting Started**](getting_started.md): Installation, first database creation, ingestion, search, and deletion.
+- [**Local Development Setup**](local_setup.md): Complete guide for setting up Rust, building executables, and running tests.
+- [**Contributing Guidelines**](../CONTRIBUTING.md): Workflow, coding standards, issue reporting, and pull request checklist.
 - [**Architecture & Internals**](architecture.md): Deep-dive into SIMD distance metrics, HNSW graph mechanics, WAL format, and concurrency design.
 - [**Metadata Filtering**](metadata_filtering.md): Complete guide to structured predicates, nested JSON dot-paths, and boolean filters.
 - [**Benchmarks & Tuning**](benchmarks.md): Throughput benchmarks, QPS, latency vs recall analysis, and parameter tuning guide.

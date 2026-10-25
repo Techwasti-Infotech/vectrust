@@ -250,11 +250,12 @@ cargo run --example persistent_storage
 
 ---
 
-## 📚 Documentation
+## 📚 Documentation & Contributing
 
-For in-depth guides, visit our documentation:
+- [**Live Documentation & Playground**](https://techwastiinfotech.github.io/vectrust/)
 - [**Documentation Home**](docs/index.md)
-- [**Getting Started Guide**](docs/getting_started.md)
+- [**Local Development Setup Guide**](docs/local_setup.md)
+- [**Contributing Guidelines**](CONTRIBUTING.md)
 - [**Architecture & Internals**](docs/architecture.md)
 - [**Metadata Filtering Guide**](docs/metadata_filtering.md)
 - [**Benchmarks & Tuning**](docs/benchmarks.md)

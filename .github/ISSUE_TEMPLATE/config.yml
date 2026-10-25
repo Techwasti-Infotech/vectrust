@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Vectrust Documentation
+    url: https://techwastiinfotech.github.io/vectrust/
+    about: Read our comprehensive guides, interactive vector playground, and architecture documentation.
+  - name: 🦀 Rustdoc API Reference
+    url: https://techwastiinfotech.github.io/vectrust/rustdoc/vectrust/index.html
+    about: Explore API documentation for all structs, methods, traits, and error variants.
+  - name: 💬 GitHub Discussions
+    url: https://github.com/techwastiinfotech/vectrust/discussions
+    about: Ask questions, discuss ideas, or share projects built with Vectrust.

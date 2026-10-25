@@ -1,0 +1,97 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve Vectrust
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue! Please provide as much relevant information as possible to help us reproduce and resolve the bug quickly.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: When calling collection.search() with ef_search > 200, an unexpected error occurs...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce & Minimal Code Example
+      description: Please share a minimal, self-contained Rust code snippet or CLI command that reproduces the issue.
+      render: rust
+      placeholder: |
+        use vectrust::prelude::*;
+
+        fn main() -> vectrust::Result<()> {
+            let db = Vectrust::in_memory();
+            // ...
+            Ok(())
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior / Error Logs
+      description: What actually happened, including backtraces or error messages.
+      render: shell
+      placeholder: |
+        Error: VectrustError::...
+        stack backtrace:
+           0: ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: index_type
+    attributes:
+      label: Index Engine Used
+      options:
+        - HNSW (Hierarchical Navigable Small World)
+        - Flat (Linear Scan)
+        - Both
+    validations:
+      required: true
+
+  - type: dropdown
+    id: storage_mode
+    attributes:
+      label: Storage Mode
+      options:
+        - Persistent (Disk with WAL & Snapshots)
+        - Ephemeral (In-Memory)
+        - CLI Executable
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment Information
+      description: OS version, architecture, and Rust version.
+      placeholder: Linux Ubuntu 24.04 (x86_64), rustc 1.80.0, vectrust 0.1.0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have searched existing issues and confirmed this is not a duplicate.
+          required: true
+        - label: I have tested this against the latest `main` branch.
+          required: false
